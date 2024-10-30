@@ -1,0 +1,57 @@
+name: Docker Build and Push to GHCR
+
+on:
+  push:
+    tags:
+      - '*-*'  # Only trigger on tags with a colon, e.g., artifactory-jcr-1.0.0
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_PATH: images
+      # You may also define your GitHub username for the image namespace
+      GHCR_USERNAME: ${{ github.repository_owner }}
+      GHCR_PATH: public-images
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Extract image name and tag
+        id: extract
+        run: |
+          # Extract the image name and version from the Git tag (e.g., artifactory-jcr:1.0.0)
+          TAG_NAME="${GITHUB_REF##*/}"
+          IMAGE_NAME="${TAG_NAME%-*}"
+          IMAGE_TAG="${TAG_NAME##*-}"
+          
+          # Set the directory path based on the image name
+          IMAGE_DIR="$IMAGE_PATH/$IMAGE_NAME"
+
+          echo "TAG_NAME=$TAG_NAME"
+          echo "IMAGE_NAME=$IMAGE_NAME"
+          echo "IMAGE_TAG=$IMAGE_TAG"
+          echo "IMAGE_DIR=$IMAGE_DIR"
+
+          # Export variables for use in other steps
+          echo "image_name=$IMAGE_NAME" >> $GITHUB_ENV
+          echo "image_tag=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "image_dir=$IMAGE_DIR" >> $GITHUB_ENV
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${GHCR_USERNAME}" --password-stdin
+
+      - name: Build Docker image
+        run: |
+          # Build the Docker image using the dynamically determined directory and tag
+          docker build -t "$REGISTRY/${GHCR_USERNAME}/${GHCR_PATH}/${{ env.image_name }}:${{ env.image_tag }}" --build-arg TAG=${{ env.image_tag }} "${{ env.image_dir }}"
+
+      - name: Push Docker image to GHCR
+        run: |
+          # Push the Docker image to GitHub Container Registry
+          docker push "$REGISTRY/${GHCR_USERNAME}/${GHCR_PATH}/${{ env.image_name }}:${{ env.image_tag }}"
+
+      - name: Log out from GitHub Container Registry
+        run: docker logout ghcr.io
