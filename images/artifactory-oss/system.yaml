@@ -1,0 +1,9 @@
+configVersion: 1
+shared:
+  database:
+    allowNonPostgresql: true
+    type: mariadb
+    driver: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://mariadb:3306/artdb?characterEncoding=UTF-8&elideSetAutoCommits=true&useSSL=false&useMysqlMetadata=true
+    username: artifactory
+    password: password
