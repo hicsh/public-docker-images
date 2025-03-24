@@ -10,7 +10,7 @@ USER root
 RUN cp ${JF_PRODUCT_HOME=/opt/jfrog/artifactory}/app/artifactory/tomcat/lib/mariadb-java-client.jar ${JF_PRODUCT_HOME=/opt/jfrog/artifactory}/app/access/tomcat/lib/mariadb-java-client.jar && \
     cp ${JF_PRODUCT_HOME=/opt/jfrog/artifactory}/app/artifactory/tomcat/lib/mariadb-java-client.jar ${JF_PRODUCT_HOME=/opt/jfrog/artifactory}/app/topology/tomcat/lib/mariadb-java-client.jar && \  
     chmod 644 ${JF_PRODUCT_HOME}/app/artifactory/tomcat/lib/mariadb-java-client.jar && \
-    chmod 644 ${JF_PRODUCT_HOME}/app/access/tomcat/lib/mariadb-java-client.jar
+    chmod 644 ${JF_PRODUCT_HOME}/app/access/tomcat/lib/mariadb-java-client.jar && \
     chmod 644 ${JF_PRODUCT_HOME}/app/topology/tomcat/lib/mariadb-java-client.jar
 USER artifactory
 
